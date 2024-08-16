@@ -1,0 +1,81 @@
+h2 {
+    margin: 30px auto;
+    font-size: 30px;
+}
+
+#searchInput {
+    padding: 5px;
+    font-size: 18px;
+    margin-bottom: 5px;
+    border-radius: 7px;
+    border: 5px solid gray;
+}
+
+#searchButton {
+    padding: 5px;
+    font-size: 16px;
+    border-radius: 7px;
+}
+/* 테이블 전체 스타일 */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+/* 테이블 헤더 스타일 */
+th {
+    position: sticky;
+    top: 0;
+    background-color: #f2f2f2;
+    text-align: left;
+    padding: 8px;
+}
+
+/* 테이블 셀 스타일 */
+td {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+
+/* 짝수 행 배경색 스타일 */
+tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+/* 홀수 행 배경색 스타일 */
+tr:nth-child(odd) {
+    background-color: #ffffff;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    list-style-type: none;
+    padding: 0;
+    margin-top: 30px;
+}
+
+.pagination li {
+    margin-right: 5px;
+}
+
+.pagination li a {
+    text-decoration: none;
+    padding: 8px;
+    background-color: #dddddd;
+    color: #333333;
+    border-radius: 5px;
+}
+
+.pagination li a:hover {
+    background-color: #aaaaaa;
+}
+
+#totalRows {
+    float: left;
+}
+
+#itemsPerPage {
+    float: right;
+}
