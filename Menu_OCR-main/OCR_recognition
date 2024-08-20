@@ -1,0 +1,69 @@
+import cv2
+import numpy as np
+import requests
+import uuid
+import time
+import json
+import re
+
+def process_image(image_path):
+    # API 설정
+    api_url = 'https://pt9imiicd0.apigw.ntruss.com/custom/v1/32971/1064efd8080faa7c40f189e9ce3a601bf0c760661d88523ed384b0f02fdbaf5d/general'
+    secret_key = 'a3pmVFRxaWt4UVB2aklLU0ljenduR2ljZUxWWUd6Zkk='
+
+    # 이미지 읽기 및 전처리
+    img = cv2.imread(image_path)
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    _, binary = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+
+    # 이미지 크기 조정
+    max_width = 1000
+    height, width = binary.shape
+    if width > max_width:
+        scaling_factor = max_width / width
+        binary = cv2.resize(binary, None, fx=scaling_factor, fy=scaling_factor, interpolation=cv2.INTER_AREA)
+
+    # 전처리된 이미지 저장
+    temp_img_path = 'temp_processed.jpg'
+    cv2.imwrite(temp_img_path, binary)
+    print("전처리된 이미지 저장:", temp_img_path)
+
+    # API 요청
+    request_json = {
+        'images': [
+            {
+                'format': 'jpg',
+                'name': 'demo'
+            }
+        ],
+        'requestId': str(uuid.uuid4()),
+        'version': 'V2',
+        'timestamp': int(round(time.time() * 1000))
+    }
+
+    payload = {'message': json.dumps(request_json).encode('UTF-8')}
+    files = [('file', open(temp_img_path, 'rb'))]
+    headers = {'X-OCR-SECRET': secret_key}
+
+    response = requests.post(api_url, headers=headers, data=payload, files=files)
+    result = response.json()
+
+    # 추출된 데이터 -> 리스트
+    text = [field['inferText'] for field in result['images'][0]['fields']] if 'images' in result and result[
+        'images'] else []
+    print("OCR 결과:", text)  # OCR 결과 프린트
+    filtered_text = filter_text(text)
+    print("필터링된 결과:", filtered_text)  # 필터링 후 결과 프린트
+    return filtered_text
+
+def filter_text(text_list):
+    filtered_text = []
+    for text in text_list:
+        # 가격 또는 특정 키워드 제외
+        if re.search(r'\d', text) or text in ["메뉴판", "식사류", "간식류", "원"]:
+            continue
+        # 숫자만 있는 텍스트 제외
+        if text.replace(',', '').isdigit():
+            continue
+        filtered_text.append(text)
+    return filtered_text

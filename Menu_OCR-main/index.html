@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>메뉴 영양 정보 찾기</title>
+</head>
+<body>
+    <h1>메뉴 영양 정보 찾기</h1>
+    <input type="file" id="fileInput">
+    <button onclick="uploadImage()">영양 정보 찾기</button>
+    <pre id="result"></pre>
+
+    <script>
+        function uploadImage() {
+            var input = document.getElementById('fileInput');
+            var file = input.files[0];
+            var formData = new FormData();
+            formData.append('image', file);
+
+            fetch('/get_nutrition', {
+                method: 'POST',
+                body: formData
+            }).then(response => response.json())
+            .then(data => {
+                var resultText = JSON.stringify(data, null, 2);
+                document.getElementById('result').innerText = resultText;
+            });
+        }
+    </script>
+</body>
+</html>
